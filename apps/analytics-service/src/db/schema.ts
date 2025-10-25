@@ -19,6 +19,9 @@ export const users = pgTable('users', {
     .notNull(),
 });
 
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
 export const userRelations = relations(users, ({ many }) => ({
   projects: many(projects),
 }));

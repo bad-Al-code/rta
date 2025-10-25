@@ -1,11 +1,19 @@
 import express, { Request, Response, json } from 'express';
+import swaggerUi from 'swagger-ui-express';
 
+import { swaggerSpec } from './config/swagger';
 import { NotFoundError } from './errors';
 import { errorHandler, httpLogger } from './middlewares';
+import { authRouter } from './routes';
 
 const app = express();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use(json());
 app.use(httpLogger);
+
+app.use('/api/v1/auth', authRouter);
 
 app.get('/health', (req: Request, res: Response) => {
   res
