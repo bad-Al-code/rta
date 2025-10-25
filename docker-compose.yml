@@ -7,7 +7,14 @@ services:
     ports:
       - '4000:4000'
     env_file:
-      - ./apps/analytics-service/.env
+      - ./apps/analytics-service/.env.docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    networks:
+      - app-network
 
   redis:
     image: redis:alpine3.20
@@ -16,6 +23,8 @@ services:
       - '6379:6379'
     volumes:
       - redis-data:/data
+    networks:
+      - app-network
 
   postgres:
     image: postgres:17.5
@@ -33,9 +42,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
   mongo:
-    image: mongo:8-nanoserver
+    image: mongo:8.0
     container_name: analytics-mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -50,8 +61,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
 volumes:
   redis-data:
   postgres-data:
   mongo-data:
+
+networks:
+  app-network:
+    driver: bridge

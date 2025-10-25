@@ -5,6 +5,7 @@ const NodeEnvSchema = z.enum(['development', 'production', 'test']);
 const envSchema = z.object({
   NODE_ENV: NodeEnvSchema.default('development'),
   PORT: z.coerce.number().default(4000),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
