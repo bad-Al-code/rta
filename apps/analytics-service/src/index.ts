@@ -1,18 +1,14 @@
 import 'dotenv/config';
-import express, { type Request, type Response } from 'express';
 
-const app = express();
-const PORT = process.env.PORT || 4000;
-
-app.get('/health', (req: Request, res: Response) => {
-  res
-    .status(200)
-    .json({ status: 'UP', message: 'Analytics service is healthy.' });
-});
+import { app } from './app';
+import { env } from './config/env';
+import logger from './config/logger';
 
 const startServer = () => {
-  app.listen(PORT, () => {
-    console.log(`Analytics service listening on port ${PORT}`);
+  app.listen(env.PORT, () => {
+    logger.info(
+      `Analytics service listening on port ${env.PORT} in ${env.NODE_ENV} mode`
+    );
   });
 };
 
