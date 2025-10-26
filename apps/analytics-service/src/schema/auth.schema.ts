@@ -52,3 +52,43 @@ export const signupSchema = z.object({
     name: z.string().optional(),
   }),
 });
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     UserLogin:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: 'test.user@example.com'
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: 'password123'
+ *     LoginResponse:
+ *       type: object
+ *       properties:
+ *         user:
+ *           $ref: '#/components/schemas/UserResponse'
+ *         accessToken:
+ *           type: string
+ *           example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+ */
+export const loginSchema = z.object({
+  body: z.object({
+    email: z.email('Not a valid email'),
+    password: z
+      .string({ error: 'Password is required' })
+      .min(1, 'Password is required')
+      .trim()
+      .refine((val) => val.length > 0, {
+        message: 'Password is required',
+      }),
+  }),
+});

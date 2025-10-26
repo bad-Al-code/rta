@@ -9,6 +9,8 @@ import {
   RATE_LIMIT_STANDARD_HEADERS,
   RATE_LIMIT_WINDOW_MS,
 } from '../config/constants';
+import { env } from '../config/env';
+import logger from '../config/logger';
 import { redisConnection } from '../config/redis';
 
 let apiLimiterInstance: RateLimitRequestHandler | null = null;
@@ -55,8 +57,20 @@ export function initializeRateLimiter(): void {
 /**
  * Rate limiter middleware for API routes.
  * This function wraps the actual rate limiter instance.
+ *
+ * Can be bypassed by setting SKIP_RATE_LIMIT=true environment variable.
  */
 export function apiLimiter(req: Request, res: Response, next: NextFunction) {
+  if (process.env.SKIP_RATE_LIMIT === 'true') {
+    logger.debug('Rate limiting skipped (SKIP_RATE_LIMIT=true)');
+
+    return next();
+  }
+
+  if (env.NODE_ENV === 'test') {
+    return next();
+  }
+
   if (!apiLimiterInstance) {
     initializeRateLimiter();
   }

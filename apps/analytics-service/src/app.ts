@@ -1,4 +1,4 @@
-import express, { json, Request, Response } from 'express';
+import express, { Application, json, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
 
 import { swaggerSpec } from './config/swagger';
@@ -6,7 +6,7 @@ import { NotFoundError } from './errors';
 import { errorHandler, httpLogger, jsonParseErrorHandler } from './middlewares';
 import { authRouter } from './routes';
 
-const app = express();
+const app: Application = express();
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
