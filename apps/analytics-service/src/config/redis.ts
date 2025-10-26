@@ -29,6 +29,13 @@ class RedisConnection {
 
     return this.client;
   }
+
+  async disconnect(): Promise<void> {
+    if (this.client) {
+      await this.client.quit();
+      logger.info('Redis client disconnected.');
+    }
+  }
 }
 
 export const redisConnection = new RedisConnection();

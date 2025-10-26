@@ -5,11 +5,14 @@ import { env } from './config/env';
 import logger from './config/logger';
 import { redisConnection } from './config/redis';
 import { checkDatabaseConnection } from './db';
+import { initializeRateLimiter } from './middlewares';
 
 const startServer = async () => {
   try {
     await checkDatabaseConnection();
     await redisConnection.connect();
+
+    initializeRateLimiter();
 
     app.listen(env.PORT, () => {
       logger.info(
