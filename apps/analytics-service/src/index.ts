@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import cluster from 'node:cluster';
+import os from 'node:os';
 
 import { app } from './app';
 import { env } from './config/env';
@@ -6,6 +8,8 @@ import logger from './config/logger';
 import { redisConnection } from './config/redis';
 import { checkDatabaseConnection } from './db';
 import { initializeRateLimiter } from './middlewares';
+
+const numCPUs = os.cpus().length;
 
 const startServer = async () => {
   try {
@@ -25,4 +29,21 @@ const startServer = async () => {
   }
 };
 
-startServer();
+if (cluster.isPrimary) {
+  logger.info(`Primary process ${process.pid} is running`);
+  logger.info(`Forking server for ${numCPUs} CPUs`);
+
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    logger.warn(
+      `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`
+    );
+    logger.info('Starting a new worker...');
+    cluster.fork();
+  });
+} else {
+  startServer();
+}
