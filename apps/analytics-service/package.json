@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "db:generate": "drizzle-kit generate",
     "db:seed": "ts-node src/db/seed/users.ts",
     "db:migrate": "ts-node src/db/migrate.ts",

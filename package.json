@@ -5,7 +5,8 @@
   "description": "Monorepo for the Real-Time Analytics Platform",
   "main": "index.js",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "format:check": "prettier . --check"
   },
   "keywords": [],
   "author": "",
