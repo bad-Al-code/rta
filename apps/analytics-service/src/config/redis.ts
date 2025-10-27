@@ -2,6 +2,7 @@ import { createClient, RedisClientType } from 'redis';
 
 import { RetryService } from '../utils';
 import { env } from './env';
+import { healthState } from './health-state';
 import logger from './logger';
 
 class RedisConnection {
@@ -12,15 +13,31 @@ class RedisConnection {
 
     this.client = createClient({ url: env.REDIS_URL });
 
-    this.client.on('error', (err) =>
-      logger.error('Redis Client Error: %o', { error: err })
-    );
-    this.client.on('ready', () => logger.info('Redis connected successfully.'));
+    this.client.on('error', (err) => {
+      logger.error('Redis Client Error: %o', { error: err });
+
+      healthState.set('redis', false, (err as Error).message);
+    });
+
+    this.client.on('ready', () => {
+      logger.info('Redis connected successfully.');
+
+      healthState.set('redis', true);
+    });
 
     const retryService = new RetryService({ serviceName: 'Redis' });
-    await retryService.execute(async () => {
-      await this.client.connect();
-    });
+
+    try {
+      await retryService.execute(async () => {
+        await this.client.connect();
+      });
+    } catch (error) {
+      healthState.set('redis', false, (error as Error).message);
+
+      logger.error('Could not connect to Redis after multiple retries.');
+
+      throw error;
+    }
   }
 
   getClient(): RedisClientType {
