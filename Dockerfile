@@ -14,8 +14,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm build
 
 WORKDIR /app/apps/analytics-service
-# RUN chown -R appuser:appgroup /app
-# USER appuser
+RUN chown -R appuser:appgroup /app
+USER appuser
 
 EXPOSE 4000
 
