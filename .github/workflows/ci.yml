@@ -1,0 +1,69 @@
+name: CI - Lint & Test
+on:
+  pull_request:
+    branches: ['main']
+  push:
+    branches-ignore: ['main']
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: analytics_db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+      redis:
+        image: redis:alpine3.20
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/analytics_db_test'
+      REDIS_URL: 'redis://localhost:6379'
+      JWT_SECRET: 'YDv83exMIvKpGN0+QwUEk6aud22W2cf6KxusojQG/Ow='
+      JWT_EXPIRES_IN: '30d'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # - name: Start Services
+      #   run: docker-compose up -d
+      #   working-directory: ./
+
+      - name: Run Linter
+        run: pnpm lint
+        working-directory: ./apps/analytics-service
+      - name: Check Formatting
+        run: pnpm format --check
+        working-directory: ./apps/analytics-service
+      - name: Run Tests
+        run: pnpm test --run
+        working-directory: ./apps/analytics-service
