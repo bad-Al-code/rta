@@ -13,8 +13,33 @@ services:
         condition: service_healthy
       mongo:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4000/api/v1/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    environment:
+      - NODE_ENV=production
+      - TZ=UTC
 
   redis:
     image: redis:alpine3.20
@@ -25,6 +50,31 @@ services:
       - redis-data:/data
     networks:
       - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: '5m'
+        max-file: '3'
 
   postgres:
     image: postgres:17.5
@@ -33,17 +83,61 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: analytics_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_INITDB_ARGS: '-E UTF8 --locale=C'
     ports:
       - '5432:5432'
     volumes:
-      - postgres-data:/var/data/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres -d analytics_db']
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - app-network
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    command:
+      - postgres
+      - -c
+      - max_connections=100
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - effective_cache_size=1GB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - checkpoint_completion_target=0.9
+      - -c
+      - wal_buffers=16MB
+      - -c
+      - default_statistics_target=100
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - effective_io_concurrency=200
+      - -c
+      - work_mem=4MB
+      - -c
+      - min_wal_size=1GB
+      - -c
+      - max_wal_size=4GB
+    shm_size: 256mb
 
   mongo:
     image: mongo:8.0
@@ -55,20 +149,47 @@ services:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
+      - mongo-config:/data/configdb
+    networks:
+      - app-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
     healthcheck:
       test: |
-        mongosh --host localhost --username root --password password --eval "db.adminCommand('ping')"
+        mongosh --quiet --host localhost --username root --password password --eval "db.adminCommand('ping').ok" --authenticationDatabase admin
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - app-network
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    command:
+      - --wiredTigerCacheSizeGB
+      - '1'
 
 volumes:
   redis-data:
+    driver: local
   postgres-data:
+    driver: local
   mongo-data:
+    driver: local
+  mongo-config:
+    driver: local
 
 networks:
   app-network:
     driver: bridge
+    # ipam:
+    #   config:
+    #     - subnet: 172.20.0.0/16
