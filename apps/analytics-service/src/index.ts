@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import cluster from 'node:cluster';
 import os from 'node:os';
 
 import { app } from './app';
@@ -29,21 +28,23 @@ const startServer = async () => {
   }
 };
 
-if (cluster.isPrimary) {
-  logger.info(`Primary process ${process.pid} is running`);
-  logger.info(`Forking server for ${numCPUs} CPUs`);
+// if (cluster.isPrimary) {
+//   logger.info(`Primary process ${process.pid} is running`);
+//   logger.info(`Forking server for ${numCPUs} CPUs`);
 
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+//   for (let i = 0; i < numCPUs; i++) {
+//     cluster.fork();
+//   }
 
-  cluster.on('exit', (worker, code, signal) => {
-    logger.warn(
-      `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`
-    );
-    logger.info('Starting a new worker...');
-    cluster.fork();
-  });
-} else {
-  startServer();
-}
+//   cluster.on('exit', (worker, code, signal) => {
+//     logger.warn(
+//       `Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`
+//     );
+//     logger.info('Starting a new worker...');
+//     cluster.fork();
+//   });
+// } else {
+//   startServer();
+// }
+
+startServer();

@@ -480,7 +480,7 @@ export function testMixed() {
  * @throws {Error} If server health check fails
  */
 export function setup() {
-  const healthUrl = BASE_URL.replace('/api/v1', '/health');
+  const healthUrl = 'http://localhost:4000/api/v1/health';
   const healthCheck = http.get(healthUrl, { timeout: '5s' });
 
   if (healthCheck.status !== 200) {
