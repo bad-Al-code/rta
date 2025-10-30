@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import os from 'node:os';
 
 import { app } from './app';
 import { env } from './config/env';
@@ -8,7 +7,7 @@ import { redisConnection } from './config/redis';
 import { checkDatabaseConnection } from './db';
 import { initializeRateLimiter } from './middlewares';
 
-const numCPUs = os.cpus().length;
+// const numCPUs = os.cpus().length;
 
 const startServer = async () => {
   try {

@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: analytics-service-quota
+  labels:
+    app: analytics-service
+    tier: application
+spec:
+  hard:
+    requests.cpu: '3'
+    requests.memory: 3Gi
+    limits.cpu: '10'
+    limits.memory: 5Gi
+    pods: '15'
+    services: '10'
+    configmaps: '15'
+    secrets: '15'
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: analytics-service-limit-range
+  labels:
+    app: analytics-service
+    tier: application
+spec:
+  limits:
+    - max:
+        cpu: '2'
+        memory: 1Gi
+      min:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 256Mi
+      defaultRequest:
+        cpu: 200m
+        memory: 256Mi
+      type: Container
+    - max:
+        cpu: '10'
+        memory: 5Gi
+      min:
+        cpu: 200m
+        memory: 256Mi
+      type: Pod

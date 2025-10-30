@@ -1,0 +1,14 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: analytics-service-pdb
+  labels:
+    app: analytics-service
+    tier: application
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: analytics-service
+      tier: application
+  unhealthyPodEvictionPolicy: AlwaysAllow

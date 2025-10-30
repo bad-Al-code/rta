@@ -5,7 +5,7 @@ export const updateUserSchema = z.object({
     name: z
       .string()
       .min(1, 'Name cannot be empty')
-      // .trim()
+      .trim()
       .min(1, 'Name cannot be empty'),
   }),
 });

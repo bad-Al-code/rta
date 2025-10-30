@@ -1,0 +1,122 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+spec:
+  schedule: '0 2 * * *'
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: postgres-backup
+              image: postgres:17.5
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  BACKUP_FILE="/backups/postgres_backup_$(date +%Y%m%d_%H%M%S).sql.gz"
+                  pg_dump -h postgres-service -U postgres -d analytics_db | gzip > $BACKUP_FILE
+                  echo "Backup completed: $BACKUP_FILE"
+                  find /backups -name "postgres_backup_*.sql.gz" -mtime +7 -delete
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-secrets
+                      key: POSTGRES_PASSWORD
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mongo-backup
+spec:
+  schedule: '0 2 * * *'
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mongo-backup
+              image: mongo:8.0
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  BACKUP_DIR="/backups/mongo_backup_$(date +%Y%m%d_%H%M%S)"
+                  mongodump --host mongo-service --username root --password $MONGO_ROOT_PASSWORD --authenticationDatabase admin --out $BACKUP_DIR
+                  cd /backups && tar -czf "${BACKUP_DIR}.tar.gz" "$(basename $BACKUP_DIR)" && rm -rf "$BACKUP_DIR"
+                  echo "Backup completed: ${BACKUP_DIR}.tar.gz"
+                  find /backups -name "mongo_backup_*.tar.gz" -mtime +7 -delete
+              env:
+                - name: MONGO_ROOT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-secrets
+                      key: MONGO_ROOT_PASSWORD
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: redis-backup
+spec:
+  schedule: '0 */6 * * *'
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: redis-backup
+              image: redis:alpine3.20
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  BACKUP_FILE="/backups/redis_backup_$(date +%Y%m%d_%H%M%S).rdb"
+                  redis-cli -h redis-service --rdb $BACKUP_FILE
+                  echo "Backup completed: $BACKUP_FILE"
+                  find /backups -name "redis_backup_*.rdb" -mtime +7 -delete
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-pvc
+  labels:
+    app: backup
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 50Gi

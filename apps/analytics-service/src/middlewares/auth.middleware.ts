@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { env } from '../config/env';
+import logger from '../config/logger';
 import { UserRepository } from '../db/repositories';
 import { User } from '../db/schema';
 import { UnauthenticatedError } from '../errors';
@@ -43,6 +44,8 @@ export const requireAuth = async (
     req.currentUser = user;
     next();
   } catch (error) {
+    logger.error(`Authenticaion failed: %o`, error);
+
     throw new UnauthenticatedError(
       'Authentication invalid: Token is invalid or expired'
     );
