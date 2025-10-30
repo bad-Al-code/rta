@@ -8,8 +8,9 @@ import {
   errorHandler,
   httpLogger,
   jsonParseErrorHandler,
+  metricsRecorder,
 } from './middlewares';
-import { authRouter, healthRouter } from './routes';
+import { authRouter, healthRouter, metricsRouter } from './routes';
 
 const app: Application = express();
 
@@ -19,9 +20,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(json());
 app.use(jsonParseErrorHandler);
 app.use(httpLogger);
+app.use(metricsRecorder);
 
-app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', healthRouter);
+app.use('/api/v1', metricsRouter);
+app.use('/api/v1/auth', authRouter);
 
 app.all('/*path', async (req, res, next) => {
   next(new NotFoundError());
