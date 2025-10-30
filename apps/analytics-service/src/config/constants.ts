@@ -5,3 +5,4 @@ export const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 export const RATE_LIMIT_MAX_REQUESTS = 1000;
 export const RATE_LIMIT_STANDARD_HEADERS = 'draft-7';
 export const RATE_LIMIT_LEGACY_HEADERS = false;
+export const USER_CACHE_TTL_SECONDS = 60 * 60;

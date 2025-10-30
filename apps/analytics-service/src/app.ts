@@ -10,7 +10,7 @@ import {
   jsonParseErrorHandler,
   metricsRecorder,
 } from './middlewares';
-import { authRouter, healthRouter, metricsRouter } from './routes';
+import { authRouter, healthRouter, metricsRouter, userRouter } from './routes';
 
 const app: Application = express();
 
@@ -25,6 +25,7 @@ app.use(metricsRecorder);
 app.use('/api/v1', healthRouter);
 app.use('/api/v1', metricsRouter);
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
 
 app.all('/*path', async (req, res, next) => {
   next(new NotFoundError());

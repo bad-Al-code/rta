@@ -1,3 +1,4 @@
+export * from './auth.middleware';
 export * from './correlation-id.middleware';
 export * from './error-handler.middleware';
 export * from './http-logger.middleware';
