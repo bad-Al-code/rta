@@ -3,11 +3,17 @@ import swaggerUi from 'swagger-ui-express';
 
 import { swaggerSpec } from './config/swagger';
 import { NotFoundError } from './errors';
-import { errorHandler, httpLogger, jsonParseErrorHandler } from './middlewares';
+import {
+  correlationIdMiddleware,
+  errorHandler,
+  httpLogger,
+  jsonParseErrorHandler,
+} from './middlewares';
 import { authRouter, healthRouter } from './routes';
 
 const app: Application = express();
 
+app.use(correlationIdMiddleware);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(json());
