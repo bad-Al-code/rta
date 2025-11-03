@@ -8,7 +8,8 @@ import { redisConnection } from '../../src/config/redis';
 import { pool } from '../../src/db';
 import { initializeRateLimiter } from '../../src/middlewares/rate-limiter.middleware';
 
-env.DATABASE_URL = `${env.DATABASE_URL}_test`;
+env.NODE_ENV = 'test';
+env.DATABASE_URL = `${env.DATABASE_URL.replace('_test', '')}_test`;
 
 const runMigrations = async () => {
   const execPromises = promisify(exec);
@@ -25,13 +26,27 @@ const runMigrations = async () => {
 };
 
 beforeAll(async () => {
-  await redisConnection.connect();
-  await runMigrations();
+  try {
+    await redisConnection.connect();
+    await runMigrations();
 
-  initializeRateLimiter();
+    initializeRateLimiter();
+
+    logger.info('Test setup completed successfully');
+  } catch (error) {
+    logger.error('Test setup failed: %o', { error });
+
+    throw error;
+  }
 });
 
 afterAll(async () => {
-  await pool.end();
-  await redisConnection.disconnect();
+  try {
+    await pool.end();
+    await redisConnection.disconnect();
+
+    logger.info('Test cleanup completed successfully');
+  } catch (error) {
+    logger.error('Test cleanup failed: %o', { error });
+  }
 });
