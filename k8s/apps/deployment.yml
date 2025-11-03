@@ -37,7 +37,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: analytics-service
-          image: badal1/analytics-service
+          image: badal1/analytics-service:1.0.7
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
