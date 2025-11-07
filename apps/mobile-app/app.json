@@ -38,6 +38,18 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Geist-Regular.otf",
+            "./assets/fonts/Geist-Medium.otf",
+            "./assets/fonts/Geist-SemiBold.otf",
+            "./assets/fonts/Geist-Bold.otf",
+            "./assets/fonts/GeistMono-Regular.otf"
+          ]
+        }
       ]
     ],
     "experiments": {
