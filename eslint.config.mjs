@@ -54,6 +54,19 @@ export default tseslint.config(
       ...reactHooksPlugin.configs.recommended.rules,
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
+      'react/no-unknown-property': [
+        'error',
+        {
+          ignore: [
+            'position',
+            'intensity',
+            'args',
+            'attach',
+            'castShadow',
+            'receiveShadow',
+          ],
+        },
+      ],
     },
   },
 
