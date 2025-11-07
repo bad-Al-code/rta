@@ -45,7 +45,6 @@ export default tseslint.config(
       'react-hooks': reactHooksPlugin,
     },
     languageOptions: {
-      ...reactPlugin.configs.recommended,
       globals: {
         ...globals.browser,
       },
