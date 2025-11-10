@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "format": "prettier . --write --ignore-path ../../.prettierignore",
+    "format": "prettier s. --write --ignore-path ../../.prettierignore",
     "format:check": "prettier . --check --ignore-path ../../.prettierignore"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "expo": "~54.0.20",
     "expo-constants": "~18.0.10",
     "expo-font": "~14.0.9",
+
     "expo-gl": "~16.0.7",
     "expo-haptics": "~15.0.7",
     "expo-image": "~3.0.10",
