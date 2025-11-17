@@ -1,7 +1,5 @@
 // @ts-check
 import prettier from 'eslint-config-prettier';
-import reactPlugin from 'eslint-plugin-react';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -33,38 +31,6 @@ export default tseslint.config(
         'error',
         {
           allowDeclarations: true,
-        },
-      ],
-    },
-  },
-
-  {
-    files: ['apps/mobile-app/**/*.{js,jsx,ts,tsx}'],
-    plugins: {
-      react: reactPlugin,
-      'react-hooks': reactHooksPlugin,
-    },
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-      },
-    },
-    rules: {
-      ...reactPlugin.configs.recommended.rules,
-      ...reactHooksPlugin.configs.recommended.rules,
-      'react/prop-types': 'off',
-      'react/react-in-jsx-scope': 'off',
-      'react/no-unknown-property': [
-        'error',
-        {
-          ignore: [
-            'position',
-            'intensity',
-            'args',
-            'attach',
-            'castShadow',
-            'receiveShadow',
-          ],
         },
       ],
     },

@@ -1,6 +1,8 @@
+import cookieParser from 'cookie-parser';
 import express, { Application, json } from 'express';
 import swaggerUi from 'swagger-ui-express';
 
+import { env } from './config/env';
 import { swaggerSpec } from './config/swagger';
 import { NotFoundError } from './errors';
 import {
@@ -20,6 +22,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(json());
 app.use(jsonParseErrorHandler);
 app.use(httpLogger);
+app.use(cookieParser(env.COOKIE_PARSER_SECRET));
 app.use(metricsRecorder);
 
 app.use('/api/v1', healthRouter);

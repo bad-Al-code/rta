@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { loginSchema, signupSchema } from '../schema';
 import { AuthService } from '../services/auth.service';
+import { attachCookiesToResponse } from '../utils';
 
 export class AuthController {
   public static async signup(req: Request, res: Response, next: NextFunction) {
@@ -12,6 +13,8 @@ export class AuthController {
       }).body;
 
       const user = await AuthService.signup({ email, password, name });
+
+      attachCookiesToResponse(res, { id: user.id, email: user.email });
 
       res.status(StatusCodes.CREATED).json(user);
     } catch (error) {
@@ -25,9 +28,11 @@ export class AuthController {
         body: req.body,
       }).body;
 
-      const result = await AuthService.login({ email, password });
+      const { user } = await AuthService.login({ email, password });
 
-      res.status(StatusCodes.OK).json(result);
+      attachCookiesToResponse(res, { id: user.id, email: user.email });
+
+      res.status(StatusCodes.OK).json({ user });
     } catch (error) {
       next(error);
     }

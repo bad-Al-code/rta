@@ -12,6 +12,9 @@ const envSchema = z.object({
     .string()
     .min(32, 'JWT_SECRET must be at least 32 characters long'),
   JWT_EXPIRES_IN: z.string().min(1, 'JWT_EXPIRES_IN is required'),
+  COOKIE_PARSER_SECRET: z
+    .string()
+    .min(32, 'COOKIE_PARSER_SECRET must be at least 32 characters long'),
 
   API_URL: z.url().default('http://localhost:4000'),
 });

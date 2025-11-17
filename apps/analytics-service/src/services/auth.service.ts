@@ -1,6 +1,3 @@
-import jwt from 'jsonwebtoken';
-
-import { env } from '../config/env';
 import { UserRepository } from '../db/repositories';
 import { NewUser } from '../db/schema';
 import { BadRequestError, UnauthenticatedError } from '../errors';
@@ -53,13 +50,8 @@ export class AuthService {
       throw new UnauthenticatedError('Invalid credentials');
     }
 
-    const userPayload = { id: user.id, email: user.email };
-    const accessToken = jwt.sign(userPayload, env.JWT_SECRET, {
-      expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
-    });
-
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userResponse } = user;
-    return { user: userResponse, accessToken };
+    return { user: userResponse };
   }
 }

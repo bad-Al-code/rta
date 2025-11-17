@@ -25,13 +25,11 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
+  const token = req.signedCookies.token;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!token) {
     throw new UnauthenticatedError('Authentication invalid: No token provided');
   }
-
-  const token = authHeader.split(' ')[1];
 
   try {
     const payload = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
