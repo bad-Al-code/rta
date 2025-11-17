@@ -17,6 +17,7 @@ import {
   healthRouter,
   metricsRouter,
   projectRouter,
+  trackRouter,
   userRouter,
 } from './routes';
 
@@ -36,6 +37,7 @@ app.use('/api/v1', metricsRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/projects', projectRouter);
+app.use('/api/v1/track', trackRouter);
 
 app.all('/*path', async (req, res, next) => {
   next(new NotFoundError());
