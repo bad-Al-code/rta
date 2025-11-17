@@ -21,4 +21,20 @@ export class ProjectController {
       next(error);
     }
   }
+
+  public static async getProjects(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.currentUser!.id;
+
+      const projects = await ProjectService.getProjectsByUserId(userId);
+
+      res.status(StatusCodes.OK).json({ projects });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

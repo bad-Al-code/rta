@@ -1,3 +1,5 @@
+import { eq } from 'drizzle-orm';
+
 import { db } from '..';
 import { NewProject, Project, projects } from '../schema';
 
@@ -14,5 +16,19 @@ export class ProjectRepository {
       .returning();
 
     return createdProject;
+  }
+
+  /**
+   * Finds all projects owned by a specific user.
+   * @param userId The ID of the user.
+   * @returns An array of projects.
+   */
+  public static async findByUserId(userId: string): Promise<Project[]> {
+    const userProjects = await db.query.projects.findMany({
+      where: eq(projects.userId, userId),
+      orderBy: (projects, { desc }) => [desc(projects.createdAt)],
+    });
+
+    return userProjects;
   }
 }

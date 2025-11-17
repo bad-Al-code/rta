@@ -14,4 +14,15 @@ export class ProjectService {
 
     return project;
   }
+
+  /**
+   * Retrieves all projects for a given user.
+   * @param userId The ID of the user.
+   * @returns An array of the user's projects.
+   */
+  public static async getProjectsByUserId(userId: string): Promise<Project[]> {
+    const projects = await ProjectRepository.findByUserId(userId);
+
+    return projects;
+  }
 }

@@ -41,4 +41,29 @@ router.post(
   ProjectController.createProject
 );
 
+/**
+ * @openapi
+ * /api/v1/projects:
+ *   get:
+ *     summary: List all projects for the authenticated user
+ *     tags: [Projects]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       '200':
+ *         description: A list of projects.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 projects:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProjectResponse'
+ *       '401':
+ *         description: Unauthorized - user is not logged in.
+ */
+router.get('/', ProjectController.getProjects);
+
 export { router as projectRouter };
