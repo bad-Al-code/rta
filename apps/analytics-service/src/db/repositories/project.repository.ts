@@ -31,4 +31,48 @@ export class ProjectRepository {
 
     return userProjects;
   }
+
+  /**
+   * Finds a single project by its ID.
+   * @param id The ID of the project.
+   * @returns A project object or undefined if not found.
+   */
+  public static async findById(id: string): Promise<Project | undefined> {
+    return db.query.projects.findFirst({
+      where: eq(projects.id, id),
+    });
+  }
+
+  /**
+   * Updates a project's data.
+   * @param id The ID of the project to update.
+   * @param data An object containing the fields to update.
+   * @returns The updated project.
+   */
+  public static async update(
+    id: string,
+    data: Partial<Pick<Project, 'name'>>
+  ): Promise<Project> {
+    const [updatedProject] = await db
+      .update(projects)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+
+    return updatedProject;
+  }
+
+  /**
+   * Deletes a project by its ID.
+   * @param id The ID of the project to delete.
+   * @returns The deleted project.
+   */
+  public static async deleteById(id: string): Promise<Project> {
+    const [deletedProject] = await db
+      .delete(projects)
+      .where(eq(projects.id, id))
+      .returning();
+
+    return deletedProject;
+  }
 }

@@ -38,3 +38,49 @@ export const createProjectSchema = z.object({
       .min(1, 'Project name cannot be empty'),
   }),
 });
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     ProjectParams:
+ *       type: object
+ *       required:
+ *         - projectId
+ *       properties:
+ *         projectId:
+ *           type: string
+ *           format: uuid
+ *           description: The ID of the project.
+ */
+export const projectParamSchema = z.object({
+  params: z.object({
+    projectId: z.uuid('Project ID cannot be empty.'),
+  }),
+});
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     UpdateProject:
+ *       type: object
+ *       required:
+ *         - name
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Updated project name.
+ *         projectId:
+ *           type: string
+ *           format: uuid
+ *           description: ID of project to update.
+ */
+export const updateProjectSchema = z.object({
+  body: z.object({
+    name: z.string({ error: 'Project name is required.' }),
+  }),
+  params: z.object({
+    projectId: z.uuid('Project ID cannot be empty.'),
+  }),
+});

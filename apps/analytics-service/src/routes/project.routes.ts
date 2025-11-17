@@ -2,7 +2,11 @@ import { IRouter, Router } from 'express';
 
 import { ProjectController } from '../controllers/project.controller';
 import { requireAuth, validateRequest } from '../middlewares';
-import { createProjectSchema } from '../schema';
+import {
+  createProjectSchema,
+  projectParamSchema,
+  updateProjectSchema,
+} from '../schema';
 
 const router: IRouter = Router();
 
@@ -65,5 +69,137 @@ router.post(
  *         description: Unauthorized - user is not logged in.
  */
 router.get('/', ProjectController.getProjects);
+
+/**
+ * @openapi
+ * /api/v1/projects:
+ *   get:
+ *     summary: List all projects for the authenticated user
+ *     tags: [Projects]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       '200':
+ *         description: A list of projects.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 projects:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProjectResponse'
+ *       '401':
+ *         description: Unauthorized - user is not logged in.
+ */
+router.get('/', ProjectController.getProjects);
+
+/**
+ * @openapi
+ * /api/v1/projects/{projectId}:
+ *   get:
+ *     summary: Get a single project by ID
+ *     tags: [Projects]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       '200':
+ *         description: Project retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project:
+ *                   $ref: '#/components/schemas/ProjectResponse'
+ *       '404':
+ *         description: Project not found.
+ *       '401':
+ *         description: Unauthorized.
+ */
+router.get(
+  '/:projectId',
+  validateRequest(projectParamSchema),
+  ProjectController.getProject
+);
+
+/**
+ * @openapi
+ * /api/v1/projects/{projectId}:
+ *   patch:
+ *     summary: Update an existing project
+ *     tags: [Projects]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateProject'
+ *     responses:
+ *       '200':
+ *         description: Project updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project:
+ *                   $ref: '#/components/schemas/ProjectResponse'
+ *       '404':
+ *         description: Project not found.
+ *       '401':
+ *         description: Unauthorized.
+ */
+router.patch(
+  '/:projectId',
+  validateRequest(updateProjectSchema),
+  ProjectController.updateProject
+);
+
+/**
+ * @openapi
+ * /api/v1/projects/{projectId}:
+ *   delete:
+ *     summary: Delete a project
+ *     tags: [Projects]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       '204':
+ *         description: Project deleted successfully.
+ *       '404':
+ *         description: Project not found.
+ *       '401':
+ *         description: Unauthorized.
+ */
+router.delete(
+  '/:projectId',
+  validateRequest(projectParamSchema),
+  ProjectController.deleteProject
+);
 
 export { router as projectRouter };
