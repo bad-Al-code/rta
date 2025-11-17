@@ -1,9 +1,11 @@
 import { IRouter, Router } from 'express';
 
+import { EventController } from '../controllers';
 import { ProjectController } from '../controllers/project.controller';
 import { requireAuth, validateRequest } from '../middlewares';
 import {
   createProjectSchema,
+  getEventsSchema,
   projectParamSchema,
   updateProjectSchema,
 } from '../schema';
@@ -200,6 +202,49 @@ router.delete(
   '/:projectId',
   validateRequest(projectParamSchema),
   ProjectController.deleteProject
+);
+
+/**
+ * @openapi
+ * /api/v1/projects/{projectId}/events:
+ *   get:
+ *     summary: List events for a specific project
+ *     tags: [Events]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *       - in: query
+ *         name: eventName
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: A paginated list of events.
+ *       '401':
+ *         description: Unauthorized.
+ *       '403':
+ *         description: Forbidden - user does not own this project.
+ */
+router.get(
+  '/:projectId/events',
+  validateRequest(getEventsSchema),
+  EventController.getEvents
 );
 
 export { router as projectRouter };
