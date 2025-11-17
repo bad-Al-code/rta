@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { getEventsSchema, getProjectStatsSchema } from '../schema';
+import {
+  getEventsSchema,
+  getProjectStatsSchema,
+  getRealTimeStatsSchema,
+} from '../schema';
 import { EventService } from '../services';
 
 export class EventController {
@@ -65,6 +69,39 @@ export class EventController {
         projectId,
         userId,
         days,
+      });
+
+      res.status(StatusCodes.OK).json({ stats });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   *
+   * @param req
+   * @param res
+   * @param next
+   */
+  public static async getRealtimeStats(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { params, query } = getRealTimeStatsSchema.parse({
+        params: req.params,
+        query: req.query,
+      });
+
+      const userId = req.currentUser!.id;
+      const { projectId } = params;
+      const { minutes } = query;
+
+      const stats = await EventService.getRealtimeStats({
+        projectId,
+        userId,
+        minutes,
       });
 
       res.status(StatusCodes.OK).json({ stats });

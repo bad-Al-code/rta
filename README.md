@@ -124,4 +124,4 @@ Most scripts should be run from within the `apps/analytics-service` directory.
 This repository is configured with two GitHub Actions workflows:
 
 1. **CI Pipeline (ci.yml)**: Automatically runs on every pull request and push to non-main branches. It performs linting, formatting checks, and runs the entire test suite against live database containers to ensure code quality and prevent regressions.
-2. **CD Pipeline (cd.yml)**: Automatically runs only when a new Git tag (e.g., v1.0.1) is pushed. It builds a production-ready Docker image, versions it with the Git tag, and pushes it to Docker Hub.
+2. **CD Pipeline (cd.yml)**: Automatically runs only when a new Git tag (e.g., v1.0.1) is pushed. It builds a production-ready Docker image, versions it with the Git tag, and pushes it to Docker Hub..

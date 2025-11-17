@@ -1,19 +1,12 @@
+import { REALTIME_METRIC_PREFIX } from '../config/constants';
+import { redisConnection } from '../config/redis';
 import AnalyticsEvent from '../models/event.model';
+import {
+  GetEventOptions,
+  GetRealTimeStatsOptions,
+  GetStatsOptions,
+} from '../types';
 import { ProjectService } from './project.service';
-
-interface GetEventOptions {
-  projectId: string;
-  userId: string;
-  page: number;
-  limit: number;
-  eventName?: string;
-}
-
-interface GetStatsOptions {
-  projectId: string;
-  userId: string;
-  days: number;
-}
 
 export class EventService {
   /**
@@ -100,5 +93,43 @@ export class EventService {
     ]);
 
     return stats[0] || { totalEvents: 0, topPages: [], eventCounts: [] };
+  }
+
+  /**
+   * Retrieves real-time event counts for a project from Redis.
+   * @param options The options for the real-time query.
+   * @returns An object containing the event count for the specified period.
+   */
+  public static async getRealtimeStats(options: GetRealTimeStatsOptions) {
+    const { projectId, userId, minutes } = options;
+
+    await ProjectService.getProjectById(projectId, userId);
+
+    const redisClient = redisConnection.getClient();
+    const now = new Date();
+    const keysToFetch: string[] = [];
+
+    for (let i = 0; i < minutes; i++) {
+      const timestamp = new Date(now.getTime() - i * 60 * 1000);
+      const timestampMinutes = timestamp.toISOString().slice(0, 16);
+
+      keysToFetch.push(
+        `${REALTIME_METRIC_PREFIX}:${projectId}:${timestampMinutes}`
+      );
+    }
+
+    let totalEvents = 0;
+    if (keysToFetch.length > 0) {
+      const result = await redisClient.mGet(keysToFetch);
+
+      totalEvents = result.reduce((sum, current) => {
+        return sum + (current ? parseInt(current, 10) : 0);
+      }, 0);
+    }
+
+    return {
+      totalEvents,
+      minutes,
+    };
   }
 }

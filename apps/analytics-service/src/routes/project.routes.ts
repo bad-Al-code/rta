@@ -7,6 +7,7 @@ import {
   createProjectSchema,
   getEventsSchema,
   getProjectStatsSchema,
+  getRealTimeStatsSchema,
   projectParamSchema,
   updateProjectSchema,
 } from '../schema';
@@ -281,6 +282,41 @@ router.get(
   '/:projectId/stats',
   validateRequest(getProjectStatsSchema),
   EventController.getProjectStats
+);
+
+/**
+ * @openapi
+ * /api/v1/projects/{projectId}/stats/realtime:
+ *   get:
+ *     summary: Get real-time event statistics for a project
+ *     tags: [Events]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: minutes
+ *         schema:
+ *           type: integer
+ *           description: The number of past minutes to include in the count.
+ *           default: 3
+ *     responses:
+ *       '200':
+ *         description: A count of events in the specified time period.
+ *       '401':
+ *         description: Unauthorized.
+ *       '403':
+ *         description: Forbidden - user does not own this project.
+ */
+router.get(
+  '/:projectId/stats/realtime',
+  validateRequest(getRealTimeStatsSchema),
+  EventController.getRealtimeStats
 );
 
 export { router as projectRouter };

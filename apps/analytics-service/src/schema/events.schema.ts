@@ -76,3 +76,40 @@ export const getProjectStatsSchema = z.object({
     days: z.coerce.number().int().positive().optional().default(7),
   }),
 });
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     GetRealTimeStats:
+ *       type: object
+ *       properties:
+ *         params:
+ *           type: object
+ *           required:
+ *             - projectId
+ *           properties:
+ *             projectId:
+ *               type: string
+ *               format: uuid
+ *               description: ID of the project.
+ *         query:
+ *           type: object
+ *           properties:
+ *             minutes:
+ *               type: integer
+ *               description: Number of minutes to fetch real-time stats for (default: 3).
+ *       example:
+ *         params:
+ *           projectId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+ *         query:
+ *           minutes: 5
+ */
+export const getRealTimeStatsSchema = z.object({
+  params: z.object({
+    projectId: z.uuid('Invalid Project ID'),
+  }),
+  query: z.object({
+    minutes: z.coerce.number().int().positive().optional().default(3),
+  }),
+});
