@@ -6,6 +6,7 @@ import { requireAuth, validateRequest } from '../middlewares';
 import {
   createProjectSchema,
   getEventsSchema,
+  getProjectStatsSchema,
   projectParamSchema,
   updateProjectSchema,
 } from '../schema';
@@ -245,6 +246,41 @@ router.get(
   '/:projectId/events',
   validateRequest(getEventsSchema),
   EventController.getEvents
+);
+
+/**
+ * @openapi
+ * /api/v1/projects/{projectId}/stats:
+ *   get:
+ *     summary: Get aggregated statistics for a project
+ *     tags: [Events]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           description: The number of past days to include in the stats.
+ *           default: 7
+ *     responses:
+ *       '200':
+ *         description: Aggregated project statistics.
+ *       '401':
+ *         description: Unauthorized.
+ *       '403':
+ *         description: Forbidden - user does not own this project.
+ */
+router.get(
+  '/:projectId/stats',
+  validateRequest(getProjectStatsSchema),
+  EventController.getProjectStats
 );
 
 export { router as projectRouter };
