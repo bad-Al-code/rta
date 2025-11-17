@@ -5,6 +5,7 @@ import { availableParallelism } from 'node:os';
 import { app } from './app';
 import { env } from './config/env';
 import logger from './config/logger';
+import { mongoConnection } from './config/mongo';
 import { redisConnection } from './config/redis';
 import { checkDatabaseConnection } from './db';
 import { initializeRateLimiter } from './middlewares';
@@ -13,8 +14,11 @@ const numCPUs = availableParallelism();
 
 const startServer = async () => {
   try {
-    await checkDatabaseConnection();
-    await redisConnection.connect();
+    await Promise.all([
+      checkDatabaseConnection(),
+      redisConnection.connect(),
+      mongoConnection.connect(),
+    ]);
 
     initializeRateLimiter();
 

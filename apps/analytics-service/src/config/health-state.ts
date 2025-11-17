@@ -1,12 +1,11 @@
-type Dependency = 'postgres' | 'redis';
-// type Dependency = 'postgres' | 'redis' | 'mongo';
+type Dependency = 'postgres' | 'redis' | 'mongo';
 type DependencyStatus = { status: 'UP' | 'DOWN'; details?: string };
 
 class HealthStateManager {
   private state: Record<Dependency, DependencyStatus> = {
     postgres: { status: 'DOWN', details: 'Initializing...' },
     redis: { status: 'DOWN', details: 'Initializing...' },
-    // mongo: { status: 'DOWN', details: 'Initializing...' },
+    mongo: { status: 'DOWN', details: 'Initializing...' },
   };
 
   /**
