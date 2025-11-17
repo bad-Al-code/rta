@@ -4,7 +4,7 @@ import { IAnalyticsEvent } from './event.model';
 
 const DeadLetterEventSchema: Schema<IAnalyticsEvent> = new Schema(
   {
-    projectId: { type: Schema.Types.ObjectId, required: true },
+    projectId: { type: String, required: true },
     eventName: { type: String, required: true },
     path: { type: String },
     userAgent: { type: String },

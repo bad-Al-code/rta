@@ -17,14 +17,14 @@ export class EventController {
     next: NextFunction
   ) {
     try {
-      const { projectId } = getEventsSchema.parse({
+      const { params, query } = getEventsSchema.parse({
         params: req.params,
-      }).params;
-      const userId = req.currentUser!.id;
-
-      const { page, limit, eventName } = getEventsSchema.parse({
         query: req.query,
-      }).query;
+      });
+
+      const { projectId } = params;
+      const { page, limit, eventName } = query;
+      const userId = req.currentUser!.id;
 
       const result = await EventService.getEvents({
         projectId,

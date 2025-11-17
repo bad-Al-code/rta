@@ -6,7 +6,7 @@ interface EventProperties {
 }
 
 export interface IAnalyticsEvent extends Document {
-  projectId: mongoose.Types.ObjectId;
+  projectId: string;
   eventName: string;
   path?: string;
   userAgent?: string;
@@ -18,8 +18,7 @@ export interface IAnalyticsEvent extends Document {
 const AnalyticsEventSchema: Schema<IAnalyticsEvent> = new Schema(
   {
     projectId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Project',
+      type: String,
       required: true,
       index: true,
     },

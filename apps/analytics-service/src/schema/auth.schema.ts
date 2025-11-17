@@ -82,7 +82,7 @@ export const signupSchema = z.object({
  */
 export const loginSchema = z.object({
   body: z.object({
-    email: z.email('Not a valid email'),
+    email: z.email('Not a valid email').trim(),
     password: z
       .string({ error: 'Password is required' })
       .min(1, 'Password is required')
