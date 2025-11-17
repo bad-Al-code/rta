@@ -25,7 +25,7 @@ export class TrackService {
       await redisClient.lPush(EVENT_QUEUE_KEY, JSON.stringify(data));
     } catch (redisError) {
       logger.error(
-        'CRITICAL: Redis queueing failed. Falling back to MongoDB dead-letter queue.',
+        'CRITICAL: Redis queueing failed. Falling back to MongoDB dead-letter queue. %o',
         {
           error: (redisError as Error).message,
           eventData: data,
@@ -36,7 +36,7 @@ export class TrackService {
         await DeadLetterEvent.create(data);
       } catch (mongoError) {
         logger.error(
-          'CATASTROPHIC: Fallback to MongoDB also failed. Event data is lost.',
+          'CATASTROPHIC: Fallback to MongoDB also failed. Event data is lost. %o',
           {
             error: (mongoError as Error).message,
             eventData: data,
