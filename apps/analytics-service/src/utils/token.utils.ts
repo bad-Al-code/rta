@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 import { User } from '../db/schema';
 
-type UserPayload = Pick<User, 'id' | 'email'>;
+type UserPayload = Pick<User, 'id' | 'email' | 'role'>;
 
 export const attachCookiesToResponse = (res: Response, user: UserPayload) => {
   const accessToken = jwt.sign(user, env.JWT_SECRET, {

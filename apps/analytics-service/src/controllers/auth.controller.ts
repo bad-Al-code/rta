@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { loginSchema, signupSchema } from '../schema';
+import { SessionService } from '../services';
 import { AuthService } from '../services/auth.service';
-import { attachCookiesToResponse } from '../utils';
 
 export class AuthController {
   public static async signup(req: Request, res: Response, next: NextFunction) {
@@ -14,9 +14,7 @@ export class AuthController {
 
       const user = await AuthService.signup({ email, password, name });
 
-      attachCookiesToResponse(res, { id: user.id, email: user.email });
-
-      res.status(StatusCodes.CREATED).json(user);
+      SessionService.sendToResponse(res, user, StatusCodes.CREATED);
     } catch (error) {
       next(error);
     }
@@ -28,11 +26,9 @@ export class AuthController {
         body: req.body,
       }).body;
 
-      const { user } = await AuthService.login({ email, password });
+      const user = await AuthService.login({ email, password });
 
-      attachCookiesToResponse(res, { id: user.id, email: user.email });
-
-      res.status(StatusCodes.OK).json({ user });
+      SessionService.sendToResponse(res, user, StatusCodes.OK);
     } catch (error) {
       next(error);
     }

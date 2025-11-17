@@ -1,5 +1,8 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+
+export const userRoleEnum = pgEnum('user_role', ['guest', 'admin']);
+export type UserRole = (typeof userRoleEnum.enumValues)[number];
 
 /**
  * Users Table
@@ -10,6 +13,7 @@ export const users = pgTable('users', {
   name: text('name'),
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
+  role: userRoleEnum('role').default('guest').notNull(),
 
   createdAt: timestamp('created_at', { withTimezone: true })
     .defaultNow()

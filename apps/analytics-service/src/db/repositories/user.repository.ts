@@ -49,7 +49,7 @@ export class UserRepository {
    * @param newUser An object conforming to the drizzle NewUser type.
    * @returns The newly created user.
    */
-  public static async create(newUser: NewUser) {
+  public static async create(newUser: NewUser): Promise<User> {
     const normalizedUser = {
       ...newUser,
       email: newUser.email.toLowerCase().trim(),
@@ -60,11 +60,7 @@ export class UserRepository {
       .values(normalizedUser)
       .returning();
 
-    return {
-      email: createdUser.email,
-      name: createdUser.name,
-      id: createdUser.id,
-    };
+    return createdUser;
   }
 
   /**

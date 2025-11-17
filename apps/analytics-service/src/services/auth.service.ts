@@ -1,5 +1,5 @@
 import { UserRepository } from '../db/repositories';
-import { NewUser } from '../db/schema';
+import { NewUser, User } from '../db/schema';
 import { BadRequestError, UnauthenticatedError } from '../errors';
 import { Password } from '../utils';
 
@@ -10,8 +10,8 @@ export class AuthService {
    * @returns The newly created user record.
    */
   public static async signup(
-    userData: Omit<NewUser, 'passwordHash'> & { password: string }
-  ) {
+    userData: Omit<NewUser, 'passwordHash' | 'role'> & { password: string }
+  ): Promise<User> {
     const { email, name, password } = userData;
     const normalizedEmail = email.toLowerCase().trim();
 
@@ -50,8 +50,6 @@ export class AuthService {
       throw new UnauthenticatedError('Invalid credentials');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, ...userResponse } = user;
-    return { user: userResponse };
+    return user;
   }
 }
