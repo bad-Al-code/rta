@@ -15,7 +15,7 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "db:generate": "drizzle-kit generate",
-    "db:seed": "ts-node src/db/seed/users.ts",
+    "db:seed": "ts-node src/db/seed/index.ts",
     "db:migrate": "ts-node src/db/migrate.ts",
     "db:studio": "drizzle-kit studio",
     "db": "pnpm db:generate; pnpm db:migrate",
