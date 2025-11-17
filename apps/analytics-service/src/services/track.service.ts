@@ -1,4 +1,8 @@
-import { EVENT_QUEUE_KEY } from '../config/constants';
+import {
+  EVENT_QUEUE_KEY,
+  REALTIME_METRIC_PREFIX,
+  REALTIME_METRIC_TTL_SECONDS,
+} from '../config/constants';
 import logger from '../config/logger';
 import { redisConnection } from '../config/redis';
 import DeadLetterEvent from '../models/dead-letter-event.model';
@@ -22,7 +26,17 @@ export class TrackService {
     try {
       const redisClient = redisConnection.getClient();
 
-      await redisClient.lPush(EVENT_QUEUE_KEY, JSON.stringify(data));
+      const timestampMinute = new Date(data.timestamp)
+        .toISOString()
+        .slice(0, 15);
+      const realtimeKey = `${REALTIME_METRIC_PREFIX}:${data.projectId}:${timestampMinute}`;
+
+      const multi = redisClient.multi();
+      multi.lPush(EVENT_QUEUE_KEY, JSON.stringify(data));
+      multi.incr(realtimeKey);
+      multi.expire(realtimeKey, REALTIME_METRIC_TTL_SECONDS);
+
+      await multi.exec();
     } catch (redisError) {
       logger.error(
         'CRITICAL: Redis queueing failed. Falling back to MongoDB dead-letter queue. %o',
