@@ -20,6 +20,13 @@ const swaggerOptions: swaggerJsdoc.Options = {
     ],
 
     components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'token',
+        },
+      },
       schemas: {
         ErrorResponse: {
           type: 'object',

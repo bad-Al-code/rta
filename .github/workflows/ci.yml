@@ -37,10 +37,11 @@ jobs:
 
     env:
       NODE_ENV: test
-      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/analytics_db_test'
-      REDIS_URL: 'redis://localhost:6379'
-      JWT_SECRET: 'YDv83exMIvKpGN0+QwUEk6aud22W2cf6KxusojQG/Ow='
-      JWT_EXPIRES_IN: '30d'
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/analytics_db_test
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ${{ secrets.JWT_SECRET_TEST }}
+      JWT_EXPIRES_IN: 30d
+      COOKIE_PARSER_SECRET: ${{ secrets.COOKIE_PARSER_SECRET_TEST }}
 
     steps:
       - name: Checkout code

@@ -9,7 +9,9 @@ import { pool } from '../../src/db';
 import { initializeRateLimiter } from '../../src/middlewares/rate-limiter.middleware';
 
 env.NODE_ENV = 'test';
-env.DATABASE_URL = `${env.DATABASE_URL.replace('_test', '')}_test`;
+env.DATABASE_URL = `${env.DATABASE_URL.replace('_db', '')}_test`;
+
+logger.info('Database url: %o', env.DATABASE_URL);
 
 const runMigrations = async () => {
   const execPromises = promisify(exec);

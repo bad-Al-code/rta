@@ -25,7 +25,16 @@ export const requireAuth = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.signedCookies.token;
+  let token: string | undefined;
+
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  }
+
+  if (!token) {
+    token = req.signedCookies.token;
+  }
 
   if (!token) {
     throw new UnauthenticatedError('Authentication invalid: No token provided');

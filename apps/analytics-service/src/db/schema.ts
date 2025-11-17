@@ -49,6 +49,9 @@ export const projects = pgTable('projects', {
     .notNull(),
 });
 
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
+
 export const projectsRelations = relations(projects, ({ one }) => ({
   user: one(users, {
     fields: [projects.userId],
