@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express, { Application, json } from 'express';
 import swaggerUi from 'swagger-ui-express';
 
@@ -26,6 +27,12 @@ const app: Application = express();
 app.use(correlationIdMiddleware);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+);
 app.use(json());
 app.use(jsonParseErrorHandler);
 app.use(httpLogger);
